@@ -4,6 +4,7 @@ REQUIREMENTS
 
 DOCUMENTATION
 1. How does it work
+Open below in: http://www.plantuml.com/plantuml/uml/
 ```puml
 @startuml
 actor User as User

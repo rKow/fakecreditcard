@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+paths:
+  fake-generation:
+    post:
+      operationId: fakeCreditCardsGeneration
+      description:
+      tags:
+        - creditCard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/FakeCreditCardGenerateRequest'
+      responses:
+        '200':
+          description: Returns uuid of started process
+          content:
+            application/json:
+              schema:
+                type: string
+  fake-generation-status:
+    post:
+      operationId: fakeCreditCardsGenerationStatus
+      description:
+      tags:
+        - creditCard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/FakeCreditCardGenerationStatusRequest'
+      responses:
+        '200':
+          description: Returns percentage of created items
+          content:
+            application/json:
+              schema:
+                type: string
+  fake-generation-report:
+    parameters:
+      - name: generationId
+        in: query
+        schema:
+          type: string
+        required: true
+        description: uuid returned in FakeCreditCardGenerateRequest
+      - name: decrypted
+        in: query
+        schema:
+          type: boolean
+        required: true
+        description: uuid returned in FakeCreditCardGenerateRequest
+    get:
+      operationId: fakeCreditCardsGenerationReport
+      description:
+      tags:
+        - creditCard
+      responses:
+        '200':
+          description: Returns the report as csv file
+          content:
+            application/csv:
+              schema:
+                type: string
+                format: binary
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+components:
+  schemas:
+    FakeCreditCardGenerateRequest:
+      type: object
+      properties:
+        numberOfCreditCardsToGenerate:
+          type: integer
+          format: int64
+          description: provide 100k - 1 milion to check the performance
+    FakeCreditCardGenerationStatusRequest:
+      type: object
+      properties:
+        generationId:
+          type: string
+          description: uuid returned in FakeCreditCardGenerateRequest

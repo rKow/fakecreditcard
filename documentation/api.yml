@@ -1,0 +1,16 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Fake Credit Card Generator Api
+
+tags:
+  - name: creditCard
+  - name: merchant
+
+paths:
+  /finance/creditcard/fakegenaration:
+    $ref: 'creditcard.yml#/paths/fake-generation'
+  /finance/creditcard/fakegenaration/status:
+    $ref: 'creditcard.yml#/paths/fake-generation-status'
+  /finance/creditcard/fakegenaration/report:
+    $ref: 'creditcard.yml#/paths/fake-generation-report'

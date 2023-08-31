@@ -1,0 +1,53 @@
+app:
+  always-authorized: true
+application:
+  tag: api
+  version: 1.0.0
+logging:
+  file:
+    path: logs/${spring.application.name}
+spring:
+  application:
+    name: "api"
+  cloud:
+    vault:
+      enabled: true
+      authentication: TOKEN
+      scheme: http
+      app-role:
+        role: application
+      token: hvs.CAESIEpRKFUUngI1juW1RSTCJmOyoqVdFt9xr3MpqadDY2FsGh4KHGh2cy5aVkpXemh2bFhrWEdGVWNseXIybUVOUUU
+      config.lifecycle:
+        enabled: true
+        min-renewal: 10s
+        expiry-threshold: 1m
+        lease-endpoints: Legacy
+      host: localhost
+      port: 8200
+      uri: http://localhost:8200
+      generic:
+        enabled: false
+    bus:
+      enabled: false
+    consul:
+      enabled: false
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/finance"
+    username: "test"
+    password: "postgres"
+  profiles:
+    active: dev
+  batch:
+    jdbc:
+      initialize-schema: always
+  config:
+    import: "vault://"
+finance:
+  credit-card:
+    fake:
+      job:
+        enabled: true
+        chunk-size: 5
+
+crypto:
+  transit-key: applicationtransit

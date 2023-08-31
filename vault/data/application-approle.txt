@@ -1,0 +1,9 @@
+Key        Value
+---        -----
+role_id    8b6b72c7-2ab8-a8ed-e329-4528a34bc3c7
+Key                   Value
+---                   -----
+secret_id             16887948-e8f5-5905-b208-3e727354454c
+secret_id_accessor    e7961732-adaa-4f2b-f405-1d266eb9e8e5
+secret_id_num_uses    0
+secret_id_ttl         0s

@@ -1,0 +1,30 @@
+﻿version: '3.9'
+services:
+  database:
+    image: postgres
+    container_name: postgres-db
+    volumes:
+#      - ./db/data:/var/lib/postgresql/data
+      - ./db/initializedb.sql:/docker-entrypoint-initdb.d/initializedb.sql
+    environment:
+      - POSTGRES_DB=finance
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+  vault:
+    container_name: "vault"
+    image: vault:1.13.3
+    ports:
+      - 8200:8200
+    environment:
+      - VAULT_ADDR=http://0.0.0.0:8200
+      - VAULT_API_ADDR=http://0.0.0.0:8200
+      - VAULT_ADDRESS=http://0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    command: vault server -config=/vault/config/vault.json
+    volumes:
+      - ./vault/config:/vault/config:rw
+      - ./vault/policies:/vault/policies:rw
+      - ./vault/data:/vault/data:rw
