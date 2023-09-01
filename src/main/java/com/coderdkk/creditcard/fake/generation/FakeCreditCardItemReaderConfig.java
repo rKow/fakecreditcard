@@ -23,12 +23,12 @@ public class FakeCreditCardItemReaderConfig {
 
   @Bean
   @StepScope
-  public JdbcPagingItemReader<CreditCardItem> fakeCreditCardItemReader(
+  public JdbcPagingItemReader<FakeCreditCardItem> fakeCreditCardItemReader(
           DataSource dataSource
           , PagingQueryProvider pagingQueryProvider
   ) {
 
-    return new JdbcPagingItemReaderBuilder<CreditCardItem>()
+    return new JdbcPagingItemReaderBuilder<FakeCreditCardItem>()
             .name("fakeCreditCardItemReader")
             .dataSource(dataSource)
             .saveState(false)
@@ -38,9 +38,9 @@ public class FakeCreditCardItemReaderConfig {
             .build();
   }
 
-  private RowMapper<CreditCardItem> getRowMapper() {
+  private RowMapper<FakeCreditCardItem> getRowMapper() {
     return (resultSet, i) -> {
-      CreditCardItemRowMapper mapper = new CreditCardItemRowMapper();
+      FakeCreditCardItemRowMapper mapper = new FakeCreditCardItemRowMapper();
       return mapper.mapRow(resultSet, i);
     };
   }

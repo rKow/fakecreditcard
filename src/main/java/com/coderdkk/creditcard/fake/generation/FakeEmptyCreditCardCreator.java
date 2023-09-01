@@ -15,7 +15,7 @@ import java.util.concurrent.Future;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FakeCreditCardGenerationCreator {
+public class FakeEmptyCreditCardCreator {
 
   private final NamedParameterJdbcTemplate jdbcTemplate;
   private final AsyncProcessManager asyncProcessManager;

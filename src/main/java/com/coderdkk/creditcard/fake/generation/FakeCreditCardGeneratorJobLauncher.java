@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(name = "finance.credit-card.fake.job.enabled", havingValue = "true")
 @RequiredArgsConstructor
-public class FakeCreditCardJobLauncher {
+public class FakeCreditCardGeneratorJobLauncher {
   private final JobLauncher jobLauncher;
   private final Job fakeCreditCardJob;
 

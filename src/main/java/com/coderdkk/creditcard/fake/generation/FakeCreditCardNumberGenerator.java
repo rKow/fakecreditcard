@@ -1,47 +1,48 @@
 package com.coderdkk.creditcard.fake.generation;
 
-import com.coderdkk.crypto.EncryptRequest;
-import com.coderdkk.crypto.VaultValueEncrypter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import com.coderdkk.creditcard.CreditCardType;
+import com.coderdkk.creditcard.LuhnCalculator;
 
-import java.time.LocalDate;
-import java.util.regex.Pattern;
+import java.util.concurrent.ThreadLocalRandom;
 
-@Service
-@RequiredArgsConstructor
 public class FakeCreditCardNumberGenerator {
 
-  private static final Pattern ONLY_NUMBER_PATTERN = Pattern.compile("\\d");
+  public String getNumber(CreditCardType creditCardType) {
+    String prefixOfCreditCardNumber = creditCardType.getPrefixes().stream().findAny().orElseThrow();
+    int lengthOfCreditCardNumber = creditCardType.getLength();
+    int lengthOfNumberToGenerate = lengthOfCreditCardNumber - prefixOfCreditCardNumber.length();
 
-  @Value("${crypto.transit-key:default}")
-  private String transitKey;
-
-  private final VaultValueEncrypter vaultValueEncrypter;
-
-  public FakeCreditCardResult getNewFake(CreditCardItem item) {
-    CrediCardNumberLuhnAlgorithmValidatableGenerator crediCardNumberLuhnAlgorithmValidatableGenerator = new CrediCardNumberLuhnAlgorithmValidatableGenerator();
-    String creditCardNumber = crediCardNumberLuhnAlgorithmValidatableGenerator.getNumber(CreditCardType.MASTER_CARD);
-    return new FakeCreditCardResult(
-            LocalDate.now().plusYears(2)
-            , creditCardNumber
-            , onlyLastFourChars(creditCardNumber)
-            , encrypt(creditCardNumber)
-            , item.getId());
+    String creditCardRandomNumber = prefixOfCreditCardNumber + calculateRandomNumber(lengthOfNumberToGenerate);
+    LuhnCalculator luhnCalculator = new LuhnCalculator();
+    int luhnResult = luhnCalculator.calculate(creditCardRandomNumber);
+    int newLastDigit = changeLastDigitToFitLuhnAlgorithmValidator(creditCardRandomNumber, luhnResult);
+    return replaceLastDigitWithNewOne(creditCardRandomNumber, newLastDigit);
   }
 
-  public String encrypt(String creditCardNumber) {
-    EncryptRequest request = new EncryptRequest();
-    request.setDecryptedValue(creditCardNumber);
-    request.setTransitKey(transitKey);
-    return vaultValueEncrypter.encrypt(request);
+  private String replaceLastDigitWithNewOne(String creditCardRandomNumber, int newLastDigit) {
+    return creditCardRandomNumber.substring(0, creditCardRandomNumber.length() - 1) + newLastDigit;
   }
 
-  public String onlyLastFourChars(String creditCardNumber) {
-    String lastFourNumbers = creditCardNumber
-            .substring(creditCardNumber.length() - 4);
-    String prefix = ONLY_NUMBER_PATTERN.matcher(creditCardNumber.substring(0, creditCardNumber.length() - 4)).replaceAll("*");
-    return prefix + lastFourNumbers;
+
+  private int changeLastDigitToFitLuhnAlgorithmValidator(String randomNumber, int luhnResult) {
+    int lastDigit = Integer.parseInt(String.valueOf(randomNumber.charAt(randomNumber.length() - 1)));
+    if (luhnResult == 0) {
+      return lastDigit;
+    }
+    if (lastDigit < luhnResult) {
+      return lastDigit + (10 - luhnResult);
+    } else if (lastDigit == luhnResult) {
+      return 0;
+    } else {
+      return lastDigit - luhnResult;
+    }
   }
+
+  private String calculateRandomNumber(int lengthOfNumberToGenerate) {
+    ThreadLocalRandom random = ThreadLocalRandom.current();
+    long anyLongWithLengthGreaterThanOrEqual16 = random.nextLong(10_000_000_000_000_000L, 100_000_000_000_000_000L);
+    String s = Long.toString(anyLongWithLengthGreaterThanOrEqual16);
+    return s.substring(0, lengthOfNumberToGenerate);
+  }
+
 }

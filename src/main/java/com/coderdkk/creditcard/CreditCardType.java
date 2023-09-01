@@ -1,4 +1,4 @@
-package com.coderdkk.creditcard.fake.generation;
+package com.coderdkk.creditcard;
 
 import lombok.Getter;
 

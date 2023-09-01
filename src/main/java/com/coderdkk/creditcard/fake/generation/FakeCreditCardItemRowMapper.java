@@ -5,10 +5,10 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CreditCardItemRowMapper implements RowMapper<CreditCardItem> {
+public class FakeCreditCardItemRowMapper implements RowMapper<FakeCreditCardItem> {
   @Override
-  public CreditCardItem mapRow(ResultSet rs, int rowNum) throws SQLException {
-    CreditCardItem processingItem = new CreditCardItem();
+  public FakeCreditCardItem mapRow(ResultSet rs, int rowNum) throws SQLException {
+    FakeCreditCardItem processingItem = new FakeCreditCardItem();
     processingItem.setId(rs.getLong("id"));
     processingItem.setGenerationId(rs.getString("generation_id"));
     return processingItem;

@@ -5,12 +5,11 @@ info:
 
 tags:
   - name: creditCard
-  - name: merchant
 
 paths:
-  /finance/creditcard/fakegenaration:
+  /finance/creditcard/fakegeneration:
     $ref: 'creditcard.yml#/paths/fake-generation'
-  /finance/creditcard/fakegenaration/status:
+  /finance/creditcard/fakegeneration/status:
     $ref: 'creditcard.yml#/paths/fake-generation-status'
-  /finance/creditcard/fakegenaration/report:
+  /finance/creditcard/fakegeneration/report:
     $ref: 'creditcard.yml#/paths/fake-generation-report'

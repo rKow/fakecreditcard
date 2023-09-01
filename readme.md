@@ -4,6 +4,7 @@ REQUIREMENTS
 
 DOCUMENTATION
 1. How does it work
+
 Open below in: http://www.plantuml.com/plantuml/uml/
 ```puml
 @startuml
@@ -55,8 +56,8 @@ docker exec -it vault /bin/sh
 3. Create token for application approle
 ```
 vault write auth/approle/login \
-    role_id=8b6b72c7-2ab8-a8ed-e329-4528a34bc3c7 \
-    secret_id=16887948-e8f5-5905-b208-3e727354454c
+    role_id=8aaff16b-8a8c-c318-3696-698a2bd4f51f \
+    secret_id=cdc457b0-f787-7994-6912-27697c69be81
 
 Key                Value
 ---                -----
@@ -83,7 +84,7 @@ spring:
 curl --request POST \
     --header "Content-Type: application/json" \
     --data '{"numberOfCreditCardsToGenerate":10, "emailAddress":"radikowalczyk@gmail.com"}' \
-    http://localhost:8080/finance/creditcard/fakegenaration
+    http://localhost:8080/finance/creditcard/fakegeneration
 ```
 Spring batch job is running. Store returned uuid which is your generation identificator.
 
@@ -101,14 +102,12 @@ It is the easiest way and we don't have to care about the major limitation becau
 ```
 curl --request POST \
 --header "Content-Type: application/json" \
---data '{"generationId": "5c41aa14-bbfe-4b3e-9b13-56b3fd9b6fba"}' \
+--data '{"generationId": "d83f9f6d-a333-4c09-adf4-c9f0cdde24c9"}' \
 http://localhost:8080/finance/creditcard/fakegeneration/status
 ```
 9. Generate and download the report
 ```
-curl --request POST \
---header "Content-Type: application/json" \
---data '{"generationId": "5c41aa14-bbfe-4b3e-9b13-56b3fd9b6fba", "decrypted": "false"}' \
-http://localhost:8080/finance/creditcard/fakegeneration/report
+curl 'http://localhost:8080/finance/creditcard/fakegeneration/report?generationId=d83f9f6d-a333-4c09-adf4-c9f0cdde24c9&decrypted=false' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8' -o report.html
+
 ```
 

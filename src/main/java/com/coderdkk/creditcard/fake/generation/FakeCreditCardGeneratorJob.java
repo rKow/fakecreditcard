@@ -55,14 +55,14 @@ public class FakeCreditCardGeneratorJob {
 
   @Bean
   public Step createEmptyCreditCardStep(
-          @Qualifier("fakeCreditCardItemReader") ItemReader<CreditCardItem> fakeCreditCardItemReader
+          @Qualifier("fakeCreditCardItemReader") ItemReader<FakeCreditCardItem> fakeCreditCardItemReader
           , FakeCreditCardItemProcessor fakeCreditCardItemProcessor
           , JobRepository jobRepository
           , PlatformTransactionManager transactionManager
           , TaskExecutor taskExecutor
           , FakeCreditCardResultWriter fakeCreditCardResultWriter) {
     return new StepBuilder("generateNumberStep", jobRepository)
-            .<CreditCardItem, FakeCreditCardResult>chunk(chunkSize, transactionManager)
+            .<FakeCreditCardItem, FakeCreditCardResult>chunk(chunkSize, transactionManager)
             .reader(fakeCreditCardItemReader)
             .processor(fakeCreditCardItemProcessor)
             .writer(fakeCreditCardResultWriter)

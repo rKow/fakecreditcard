@@ -6,12 +6,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class FakeCreditCardItemProcessor implements ItemProcessor<CreditCardItem, FakeCreditCardResult> {
+public class FakeCreditCardItemProcessor implements ItemProcessor<FakeCreditCardItem, FakeCreditCardResult> {
 
-  private final FakeCreditCardNumberGenerator fakeCreditCardNumberGenerator;
+  private final FakeCreditCardGenerator fakeCreditCardGenerator;
 
   @Override
-  public FakeCreditCardResult process(CreditCardItem item) throws Exception {
-    return fakeCreditCardNumberGenerator.getNewFake(item);
+  public FakeCreditCardResult process(FakeCreditCardItem item) throws Exception {
+    return fakeCreditCardGenerator.getNewFake(item);
   }
 }

@@ -1,7 +1,8 @@
-package com.coderdkk.creditcard;
+package com.coderdkk;
 
 import com.coderdkk.api.FinanceApi;
-import com.coderdkk.creditcard.fake.generation.FakeCreditCardGenerationCreator;
+import com.coderdkk.creditcard.fake.generation.FakeEmptyCreditCardCreator;
+import com.coderdkk.creditcard.fake.report.FakeCreditCardGenerationReportCreator;
 import com.coderdkk.creditcard.fake.status.FakeCreditCardGenerationStatusGetter;
 import com.coderdkk.datamodel.FakeCreditCardGenerateRequest;
 import com.coderdkk.datamodel.FakeCreditCardGenerationStatusRequest;
@@ -17,12 +18,13 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class ApiController implements FinanceApi {
 
-  private final FakeCreditCardGenerationCreator fakeCreditCardGenerationCreator;
+  private final FakeEmptyCreditCardCreator fakeEmptyCreditCardCreator;
   private final FakeCreditCardGenerationStatusGetter fakeCreditCardGenerationStatusGetter;
+  private final FakeCreditCardGenerationReportCreator fakeCreditCardGenerationReportCreator;
 
   @Override
   public ResponseEntity<String> fakeCreditCardsGeneration(FakeCreditCardGenerateRequest fakeCreditCardGenerateRequest) {
-    return new ResponseEntity<>(fakeCreditCardGenerationCreator.createEmptyCreditCard(fakeCreditCardGenerateRequest), HttpStatus.OK);
+    return new ResponseEntity<>(fakeEmptyCreditCardCreator.createEmptyCreditCard(fakeCreditCardGenerateRequest), HttpStatus.OK);
   }
 
   @Override
@@ -32,7 +34,7 @@ public class ApiController implements FinanceApi {
 
   @Override
   public ResponseEntity<Resource> fakeCreditCardsGenerationReport(String generationId, Boolean decrypted) {
-    return FinanceApi.super.fakeCreditCardsGenerationReport(generationId, decrypted);
+    return new ResponseEntity<>(fakeCreditCardGenerationReportCreator.get(generationId, decrypted), HttpStatus.OK);
   }
 
 

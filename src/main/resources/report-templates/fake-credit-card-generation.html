@@ -1,0 +1,27 @@
+<html>
+<body>
+<div style="text-align: center;">
+	<h2>$creditCards.size() credit cards in generation!</h2>
+	<br/>
+	#set( $count = 1 )
+	<table class="styled-table">
+		<thead>
+		<tr>
+			<th>id</th>
+			<th>Credit Card Number</th>
+			<th>Masked</th>
+		</tr>
+		</thead>
+		#foreach( $creditCard in $creditCards )
+		<tr>
+			<td>$count</td>
+			<td>$creditCard.getCreditCardNumber()</td>
+			<td>$creditCard.getMaskedCreditCardNumber()</td>
+		</tr>
+		#set( $count = $count + 1 )
+		#end
+	</table>
+	<br/>
+</div>
+</body>
+</html>
