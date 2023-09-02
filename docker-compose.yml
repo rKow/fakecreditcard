@@ -1,5 +1,21 @@
 ﻿version: '3.9'
 services:
+  fake-cc-app:
+    image: rdkk/coderdkk:fakecreditcard
+    container_name: fake-cc-app
+    depends_on:
+      - database
+      - vault
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    environment:
+      - "spring.cloud.vault.host=vault"
+      - "spring.cloud.vault.port=8200"
+      - "spring.cloud.vault.uri=http://vault:8200"
+      - "spring.cloud.vault.token=hvs.CAESIA6rOAPvZJjAirbt7bcgbQYei5LLydZ6kHb-2MuwWUQAGh4KHGh2cy45aTdPUmFDbTlRdTFET2dnQnFHeHFOYXo"
+      - "spring.datasource.url=jdbc:postgresql://database:5432/finance"
   database:
     image: postgres
     container_name: postgres-db
@@ -23,7 +39,7 @@ services:
       - VAULT_ADDRESS=http://0.0.0.0:8200
     cap_add:
       - IPC_LOCK
-    command: vault server -config=/vault/config/vault.json
+    command: ./vault/data/vault-init.sh
     volumes:
       - ./vault/config:/vault/config:rw
       - ./vault/policies:/vault/policies:rw

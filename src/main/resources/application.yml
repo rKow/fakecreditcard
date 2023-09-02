@@ -16,7 +16,7 @@ spring:
       scheme: http
       app-role:
         role: application
-      token: hvs.CAESIEpRKFUUngI1juW1RSTCJmOyoqVdFt9xr3MpqadDY2FsGh4KHGh2cy5aVkpXemh2bFhrWEdGVWNseXIybUVOUUU
+      token: hvs.CAESIMbCXnTf5Rkm3ispEQ_PStPJR-0I31pBHw3DN4rRdiRzGh4KHGh2cy5tRDZ6UEw1MWwzSzBuMnY2TWRlQ2JjQ2g
       config.lifecycle:
         enabled: true
         min-renewal: 10s

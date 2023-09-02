@@ -3,7 +3,7 @@ REQUIREMENTS
 2. Installed `docker-compose`
 
 DOCUMENTATION
-1. How does it work
+1. How does it work?
 
 Open below in: http://www.plantuml.com/plantuml/uml/
 ```puml
@@ -41,23 +41,33 @@ $ cd ./documentation
 $ npx redoc-cli bundle api.yml
 ```
 redoc-static.html should be placed in ./documentation/redoc-static.html
+
 b) or open currently generated recoc-static.html in your webbrowser
 
 USER GUIDE
-1. Run  dependant services (vault, rabbit, database)
+1. Building docker image of app
+a) Go to directory where Dockerfile is located and invoke:
+``` 
+ docker image build -t fakecreditcard:latest .
 ```
-docker-compose up -d
+b) push an image to repo
 ```
-2. Initialize vault
+docker login --username=<user username> --password=<user password>
+docker tag aedc0c1c67ae rdkk/coderdkk:fakecreditcard
+docker push rdkk/coderdkk:fakecreditcard
 ```
-docker exec -it vault /bin/sh
-/vault/data/vault-init.sh
+2. Start vault
 ```
+docker-compose up -d vault
+```
+
 3. Create token for application approle
 ```
+docker exec -it vault /bin/sh
+
 vault write auth/approle/login \
-    role_id=8aaff16b-8a8c-c318-3696-698a2bd4f51f \
-    secret_id=cdc457b0-f787-7994-6912-27697c69be81
+    role_id=52bde1e0-2a2f-7fe4-1ff9-a04b5ce89516 \
+    secret_id=2cd46a08-dfd4-dd6b-9c0c-4c100f4e1c52
 
 Key                Value
 ---                -----
@@ -68,46 +78,47 @@ token_renewable    true
 token_policies     [default]
 
 ```
-4. Copy token and set it in application.yml
+4. Copy token and set it in application
+
+a) in case of running locally change application.yml:
 ```
 spring:
   cloud:
     vault:
       token: yourtokenhere
 ```
-5. Run financeapp
+
+b) in case of running via docker-compose:
+``` 
+services:
+  fake_cc_app:
+    environment:
+      - "spring.cloud.vault.token=yourtokenhere"
 ```
 
+6. Run all other services 
+```
+docker-compose up -d
 ```
 7. Start generation
 ```
 curl --request POST \
     --header "Content-Type: application/json" \
-    --data '{"numberOfCreditCardsToGenerate":10, "emailAddress":"radikowalczyk@gmail.com"}' \
+    --data '{"numberOfCreditCardsToGenerate":100000 }' \
     http://localhost:8080/finance/creditcard/fakegeneration
 ```
 Spring batch job is running. Store returned uuid which is your generation identificator.
-
-There are alternatives to increase performance with spring batch:
-   Multithreading - easiest way (via TaskExecutor), but only when we don't need restart or we need restart but also can store state of processed item. If we need restarts and can't store the state (eq. when we process file) - this approach can't be used. 
-    runs reader, processor and writers in same thread. Remember to write each of them as 'thread safe' (eq. JdbcPagingItemReader rather than JdbcCursorItemReader)
-   Remote chunking - when item processing takes much time (not read/write action)
-   Remote partitioning - when read/write operation is a bootleneck
-   Parallel Steps - Using Spring Batch's split functionality you can execute multiple steps in parallel.
-
-We decided to use multithreaded and parallel steps to improve performance.
-It is the easiest way and we don't have to care about the major limitation because we can store state (eq. - is_processed flag ) and in fact we don't need to restart process
 
 8. Check the current state of processing
 ```
 curl --request POST \
 --header "Content-Type: application/json" \
---data '{"generationId": "d83f9f6d-a333-4c09-adf4-c9f0cdde24c9"}' \
+--data '{"generationId": "fba637bc-6e43-4c00-83a3-a157f2dbc4d2"}' \
 http://localhost:8080/finance/creditcard/fakegeneration/status
 ```
 9. Generate and download the report
 ```
-curl 'http://localhost:8080/finance/creditcard/fakegeneration/report?generationId=d83f9f6d-a333-4c09-adf4-c9f0cdde24c9&decrypted=false' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8' -o report.html
+curl 'http://localhost:8080/finance/creditcard/fakegeneration/report?generationId=fba637bc-6e43-4c00-83a3-a157f2dbc4d2&decrypted=false' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8' -o report.html
 
 ```
 

@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultOperations;
 import org.springframework.vault.support.Ciphertext;
 
-@ConditionalOnProperty(name = "spring.cloud.vault.enabled",  havingValue = "true")
+import java.util.List;
+
+@ConditionalOnProperty(name = "spring.cloud.vault.enabled", havingValue = "true")
 @Service
 @RequiredArgsConstructor
 public class VaultValueDecrypter {
@@ -17,6 +19,12 @@ public class VaultValueDecrypter {
     return vaultOperations.opsForTransit()
             .decrypt(decryptRequest.getTransitKey(), Ciphertext.of(decryptRequest.getEncryptedValue()))
             .asString();
+  }
+
+  public List<String> batchDecrypt(BatchDecryptRequest decryptRequest) {
+    return vaultOperations.opsForTransit()
+            .decrypt(decryptRequest.getTransitKey(), decryptRequest.getEncryptedValuesAsCipherTexts())
+            .stream().map(res -> res.getAsString()).toList();
   }
 
 }

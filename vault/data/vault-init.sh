@@ -1,44 +1,73 @@
 #!/bin/sh
 
-rm /vault/data/*.txt
+onStartup() {
+  sleep 10
 
-## INIT VAULT
-echo "Init vault..."
-vault operator init > /vault/data/initresult.txt
-VAULT_TOKEN=$(grep 'Initial Root Token:' /vault/data/initresult.txt | awk '{print substr($NF, 1, length($NF))}')
+  init=$(vault operator init -status)
 
-## UNSEAL VAULT
-echo "Unseal..."
-vault operator unseal $(grep 'Key 1:' /vault/data/initresult.txt | awk '{print $NF}')
-vault operator unseal $(grep 'Key 2:' /vault/data/initresult.txt | awk '{print $NF}')
-vault operator unseal $(grep 'Key 3:' /vault/data/initresult.txt | awk '{print $NF}')
+  if [ "$init" != "Vault is initialized" ]; then
 
-## AUTH
-echo "Login..."
-vault login ${VAULT_TOKEN}
+    echo "Removing old config files."
+    rm /vault/data/*.txt
 
-## CREATE USER
-echo "Creating user"
-vault auth enable userpass
-vault policy write admin /vault/policies/admin-policy.hcl
-vault write auth/userpass/users/admin password=admin policies=admin
+    ## INIT VAULT
+    echo "Init vault..."
+    vault operator init > /vault/data/initresult.txt
+    VAULT_TOKEN=$(grep 'Initial Root Token:' /vault/data/initresult.txt | awk '{print substr($NF, 1, length($NF))}')
 
-# Enable approle auth
-vault auth enable approle
-# Create policy
-vault policy write application /vault/policies/application-policy.hcl
+    ## UNSEAL VAULT
+    echo "Unseal..."
+    vault operator unseal $(grep 'Key 1:' /vault/data/initresult.txt | awk '{print $NF}')
+    vault operator unseal $(grep 'Key 2:' /vault/data/initresult.txt | awk '{print $NF}')
+    vault operator unseal $(grep 'Key 3:' /vault/data/initresult.txt | awk '{print $NF}')
 
-# Create roles
-vault write auth/approle/role/application policies=application
-# Get roleId and secretId for role
-vault read auth/approle/role/application/role-id > /vault/data/application-approle.txt
-vault write -f auth/approle/role/application/secret-id >> /vault/data/application-approle.txt
+    ## AUTH
+    echo "Login..."
+    vault login ${VAULT_TOKEN}
 
-## ENABLE secrets
-vault secrets enable transit
+    ## CREATE USER
+    echo "Creating user"
+    vault auth enable userpass
+    vault policy write admin /vault/policies/admin-policy.hcl
+    vault write auth/userpass/users/admin password=admin policies=admin
 
-# Enable transit
-vault write -f transit/keys/applicationtransit exportable=true allow_plaintext_backup=true
-vault read --field=backup /transit/backup/applicationtransit > /vault/data/applicationtransit.txt
+    # Enable approle auth
+    vault auth enable approle
+    # Create policy
+    vault policy write application /vault/policies/application-policy.hcl
 
-unset VAULT_TOKEN
+    # Create roles
+    vault write auth/approle/role/application policies=application
+    # Get roleId and secretId for role
+    vault read auth/approle/role/application/role-id > /vault/data/application-approle.txt
+    vault write -f auth/approle/role/application/secret-id >> /vault/data/application-approle.txt
+
+    ## ENABLE secrets
+    vault secrets enable transit
+
+    # Enable transit
+    vault write -f transit/keys/applicationtransit exportable=true allow_plaintext_backup=true
+    vault read --field=backup /transit/backup/applicationtransit > /vault/data/applicationtransit.txt
+
+    unset VAULT_TOKEN
+
+  else
+    echo "Vault is already initialized"
+  fi
+
+  ## UNSEAL VAULT
+  echo "Unseal..."
+  vault operator unseal $(grep 'Key 1:' /vault/data/initresult.txt | awk '{print $NF}')
+  vault operator unseal $(grep 'Key 2:' /vault/data/initresult.txt | awk '{print $NF}')
+  vault operator unseal $(grep 'Key 3:' /vault/data/initresult.txt | awk '{print $NF}')
+
+
+}
+
+
+# Start vault
+echo "Start onStartup procedure in background..."
+onStartup &
+
+echo "Start vault..."
+vault server -config=/vault/config/vault.json
