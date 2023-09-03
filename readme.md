@@ -45,23 +45,12 @@ redoc-static.html should be placed in ./documentation/redoc-static.html
 b) or open currently generated recoc-static.html in your webbrowser
 
 USER GUIDE
-1. Building docker image of app
-a) Go to directory where Dockerfile is located and invoke:
-``` 
- docker image build -t fakecreditcard:latest .
-```
-b) push an image to repo
-```
-docker login --username=<user username> --password=<user password>
-docker tag aedc0c1c67ae rdkk/coderdkk:fakecreditcard
-docker push rdkk/coderdkk:fakecreditcard
-```
-2. Start vault
+1. Start vault
 ```
 docker-compose up -d vault
 ```
 
-3. Create token for application approle
+2. Create token for application approle
 ```
 docker exec -it vault /bin/sh
 
@@ -78,17 +67,8 @@ token_renewable    true
 token_policies     [default]
 
 ```
-4. Copy token and set it in application
-
-a) in case of running locally change application.yml:
-```
-spring:
-  cloud:
-    vault:
-      token: yourtokenhere
-```
-
-b) in case of running via docker-compose:
+3. Copy token and set it in application
+Change docker-compose.yml:
 ``` 
 services:
   fake_cc_app:
@@ -122,3 +102,16 @@ curl 'http://localhost:8080/finance/creditcard/fakegeneration/report?generationI
 
 ```
 
+DEVELOPER GUIDE
+1. Building docker image of app
+
+a) Go to directory where Dockerfile is located and invoke:
+``` 
+docker image build -t fakecreditcard:latest .
+```
+b) push an image to repo
+```
+docker login --username=<user username> --password=<user password>
+docker tag aedc0c1c67ae rdkk/coderdkk:fakecreditcard
+docker push rdkk/coderdkk:fakecreditcard
+```
